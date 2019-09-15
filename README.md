@@ -14,7 +14,6 @@
       workon #查看当前电脑中所有的Python虚拟环境 
       workon test #进入test的Python的虚拟环境中，成功进入test的虚拟环境，命令行会有一个（test）的标志。
       deactivate #退出当前Python的虚拟环境 
-      
     2.
     
    

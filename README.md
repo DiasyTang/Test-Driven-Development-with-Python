@@ -40,7 +40,7 @@ assert 'Django' in browser.title
 ###### 2.使用它来打开我们期望的从本地PC提供的网页
 ###### 3.检查（使用断言）页面标题是否有“Django”
 ###### 4.python functional_tests.py
-####### 我们应该会看到一个浏览器窗口被推出来，然后打开localhost:8000，最后你会看到一个“无法连接”的错误页面。在后面我们再修复
+###### 我们应该会看到一个浏览器窗口被推出来，然后打开localhost:8000，最后你会看到一个“无法连接”的错误页面。在后面我们再修复
 ## 开始Django的运行
 在这里，我们已经安装了Django，第一步是创建一个项目，这是我们站点的主要内容。Django为此提供了一个命令行工具：
 $ django-admin.py startproject superlists

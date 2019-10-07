@@ -25,14 +25,39 @@ pip3 install django
 pip3 install selenium
 ```
 ##### 3.安装Firefox和Geckodriver（Firefox正常安装）
-[Geckodriver](https://github.com/mozilla/geckodriver/releases)
-
+[Geckodriver](https://github.com/mozilla/geckodriver/releases
 下载后将Geckodriver放入Python的PATH中（Python的PATH可以在当前用户目录中的.bash_profile中查看到）
+##### 注意在VSCode中配置虚拟环境
+在settings中进行设置,在配置搜索中输入python.venv，会看到python.venvFolders和python.venvPath（虚拟环境保存目录）
+```
+ "python.venvPath": "~/env_workspaces",
+    "python.venvFolders": [
+        "envs",
+        ".pyenv",
+        ".direnv",
+        "test"
+    ]
+```
+虚拟环境是通过名称识别的,例如在~/env_workspaces目录下test就不被".env"识别到.在这之后重启vscode，再通过命令面板Python: Select Interpreter来重新选择解释器。
+```
+"configurations": [
+        {
+            "name": "Python Experimental: Current File (Integrated Terminal)",
+            "type": "pythonExperimental",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "env": {},
+            "envFile": "${workspaceRoot}/test",
+        }
+ ```
+ 在launch.json中修改配置，来让python调试时，能够根据你需要的虚拟环境来进行调试。
 ## 第一个项目
 开始我们的第一个项目（functional_test.py），来检测我们的环境是否安装OK
 ```
 from selenium import webdriver
-browser = webdriver.Firefox() browser.get('http://localhost:8000')
+browser = webdriver.Firefox() 
+browser.get('http://localhost:8000')
 assert 'Django' in browser.title
 ```
 ##### 这是我们第一个功能测试，我来详细说一下：

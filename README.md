@@ -81,10 +81,13 @@ $ django-admin.py startproject superlists
     ├── urls.py       
     └── wsgi.py 
 ```
-$cd superlists
-$python manage.py runserver
+```
+$cd superlists 
+$python manage.py runserver 
+```
 Django的开发服务将会被开启并运行在我们的机器上。这个时候我们可以打开另一个命令行，再运行我们的第一个项目
+```
 $python functional_tests.py
-
+```
     
    

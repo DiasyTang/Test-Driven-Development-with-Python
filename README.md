@@ -25,7 +25,7 @@ pip3 install django
 pip3 install selenium
 ```
 ##### 3.安装Firefox和Geckodriver（Firefox正常安装）
-[Geckodriver](https://github.com/mozilla/geckodriver/releases
+[Geckodriver](https://github.com/mozilla/geckodriver/releases)
 下载后将Geckodriver放入Python的PATH中（Python的PATH可以在当前用户目录中的.bash_profile中查看到）
 ##### 注意在VSCode中配置虚拟环境
 在settings中进行设置,在配置搜索中输入python.venv，会看到python.venvFolders和python.venvPath（虚拟环境保存目录）

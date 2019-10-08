@@ -35,7 +35,7 @@ pip3 install selenium
         "envs",
         ".pyenv",
         ".direnv",
-        "test"
+        "test" //这是我的虚拟环境的名称
     ]
 ```
 虚拟环境是通过名称识别的,例如在~/env_workspaces目录下test就不被".env"识别到.在这之后重启vscode，再通过命令面板Python: Select Interpreter来重新选择解释器。
@@ -64,14 +64,14 @@ assert 'Django' in browser.title
 ###### 1.开始了一个Selenium "webdriver"来推出一个真正的Firefox浏览器窗口
 ###### 2.使用它来打开我们期望的从本地PC提供的网页
 ###### 3.检查（使用断言）页面标题是否有“Django”
-###### 4.python functional_tests.py
+###### 4.python functional_test.py
 ###### 我们应该会看到一个浏览器窗口被推出来，然后打开localhost:8000，最后你会看到一个“无法连接”的错误页面。在后面我们再修复
 ## 开始Django的运行
 在这里，我们已经安装了Django，第一步是创建一个项目，这是我们站点的主要内容。Django为此提供了一个命令行工具：
 $ django-admin.py startproject superlists
 ```
 （这是文件结构）
-├── functional_tests.py 
+├── functional_test.py 
 ├── geckodriver.log 
 └── superlists    
     ├── manage.py    
@@ -87,12 +87,12 @@ $python manage.py runserver
 ```
 Django的开发服务将会被开启并运行在我们的机器上。这个时候我们可以打开另一个命令行，再运行我们的第一个项目
 ```
-$python functional_tests.py
+$python functional_test.py
 ```
 ## 使用unittest模块来扩展我们的功能测试
 功能测试又被称为对验收测试或端到端测试。这些测试着眼于整个应用程序功能，但不了解被测系统的内部情况，另一个术语是黑盒测试。
 我们来调整一下测试，该测试只是检查了默认的Django“有效”的页面，并检查了一些我们想在真实页面中看到的东西。这次我们来构建一个待办事项列表网站。
-##### 我们来调整一下functional_tests.py
+##### 我们来调整一下functional_test.py
 ```
 from selenium import webdriver
 
@@ -104,7 +104,7 @@ browser.quit() //浏览器关闭
 请注意一下，我们修改了断言以查找“To-Do”而不是“Django”。这意味着现在的测试是失败的。我们来运行一下：
 ```
 $python manage.py runserver（运行服务器）
-$python functional_tests.py
+$python functional_test.py
 ```
 如预期一样我们测试失败了，这实际上是一个好消息，虽然不如测试通过，但至少是因为正确的原因而失败。这是一个好的开始。
 ### python标准库的单元测试模块
@@ -112,7 +112,7 @@ $python functional_tests.py
 ```
 assert "To-Do" in browser.title, "Browser title was " + browser.title
 ```
-我们还可以通过try/finally来清理旧的Firefox窗口。但是这些问题在测试中是很常见的，在python标准库的单元测试模块中有一些已经准备好的解决方案，让我们来试试。在functional_tests.py：
+我们还可以通过try/finally来清理旧的Firefox窗口。但是这些问题在测试中是很常见的，在python标准库的单元测试模块中有一些已经准备好的解决方案，让我们来试试。在functional_test.py：
 ```
 from selenium import webdriver
 import unittest
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 7、warning='ignore'会在编写时禁止发出多余的ResourceWarning。当你阅读时可能已经消失了；请尝试删除它！</br>
 现在让我们来试一试！
 ```
-$python functional_tests.py
+$python functional_test.py
 ```
 输出结果
 ```

@@ -281,6 +281,109 @@ Ran 1 test in 0.000s
 FAILED (errors=1)
  ```
  因为我们没有编写home_page，报了我们预期的错误。
+ ### 最后我们编写一些应用程序代码
+ 之前我们的错误是无法从lists.views中导入home_page，现在我们来修复它，在lists/views.py中：
+  ```
+from django.shortcuts import render
+
+# Create your views here.
+home_page = None
+ ```
+  执行命令：
+ ```
+ $python manage.py test
+ ```
+ 运行结果：
+  ```
+  Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+E
+======================================================================
+ERROR: test_root_url_resolves_to_home_page_view (lists.tests.HomePageTest) //
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Test-Driven-Development-with-Python\superlists\lists\tests.py", line 8, in test_root_url_resolves_to_home_page_view
+    found = resolve("/")
+  File "C:\Users\tina\Envs\venv\lib\site-packages\django\urls\base.py", line 24, in resolve
+    return get_resolver(urlconf).resolve(path)
+  File "C:\Users\tina\Envs\venv\lib\site-packages\django\urls\resolvers.py", line 567, in resolve
+    raise Resolver404({'tried': tried, 'path': new_path})
+django.urls.exceptions.Resolver404: {'tried': [[<URLResolver <URLPattern list> (admin:admin) 'admin/'>]], 'path': ''}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)
+Destroying test database for alias 'default'...
+  ```
+ 测试结果告诉我们需要一个URL映射。Django使用urls.py的文件来将URL映射到视图函数。在superlists/superlists文件夹中有一个对于整个站点中主要的urls.py，在superlists/urls.py中，我们来看看：
+```
+"""superlists URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/2.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
+```
+网址条目以正则表达式开始，该正则表达式定义了该网址适用于哪些 网址，并继续说明了这些请求发送到哪里，要么是你提供的视图函数，要么是其它地方的另一个urls.py文件。<br>
+我们将移除admin的URL，因为我们到目前为止将不会使用Django admin站点，在superlists/urls.py中：
+```
+from django.contrib import admin
+from django.urls import path
+from lists import views
+from django.conf.urls import url
+
+urlpatterns = [
+    url(r"^$", views.home_page, name="home")
+]
+```
+执行命令：
+```
+ $python manage.py test
+```
+运行结果：
+```
+[...]
+TypeError: view must be a callable or a list/tuple in the case of include().
+```
+现在已经不再报404了，bug信息是比较混乱的，但是最后的消息告诉我们发生了什么：单元测试实际上已经让URL“/”与在list/views.py中的home_page=None产生了关联，但是现在在抱怨home_page视图不可调用。回到list/views.py文件：
+```
+from django.shortcuts import render
+
+# Create your views here.
+def home_page():
+    pass
+```
+执行命令：
+```
+ $python manage.py test
+```
+运行结果：
+```
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+OK
+Destroying test database for alias 'default'...
+```
  
 
 

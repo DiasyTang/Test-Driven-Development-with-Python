@@ -235,6 +235,54 @@ Ran 1 test in 0.001s
 FAILED (failures=1)
 Destroying test database for alias 'default'...
 ```
+### Django的MVC，URL和查看功能
+Django是按照经典的MVC模式来构建的。它肯定有模型，但是它的视图更像是一个控制器，而模板实际上是视图的一部分。无论采用哪种方式，就像使用任何web服务器一样，Django的主要工作都是决定当用户在我们网站上请求特定的URL时该怎么做。Django的工作流程如下：<br>
+1、针对特定地址的HTTP请求<br>
+2、Django使用一些规则来决定哪一个视图函数处理该请求（这是解析地址）<br>
+3、视图函数处理请求并返回一个HTTP的响应<br>
+所以我们将测试两件事：我们能不能将站点的根目录的URL解析成我们已经完成了的特定的视图函数和我们能不能让视图函数返回一些HTML来通过功能测试<br>
+我们现在开始，在lists/tests.py中
+```
+from django.test import TestCase
+from lists.views import home_page //这是我们接下来要编写的veiw函数，它实际上将返回我们想要的HTML。我们计划将它你别想在lists/views.py中。
+from django.urls import resolve
+
+# Create your tests here.
+class HomePageTest(TestCase):
+    def test_root_url_resolves_to_home_page_view(self):
+        found = resolve("/") //resolve是Django内部用来解析URL并查找它们应映射到的视图函数。当调用“/”（网站的根目录）时，会找到名为home_page的函数。
+        self.assertEqual(found.func, home_page)
+```
+ 执行命令：
+ ```
+ $python manage.py test
+ ```
+ 运行结果：
+  ```
+ System check identified no issues (0 silenced).
+E
+======================================================================
+ERROR: lists.tests (unittest.loader._FailedTest)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: lists.tests
+Traceback (most recent call last):
+  File "c:\users\tina\appdata\local\programs\python\python37\Lib\unittest\loader.py", line 436, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "c:\users\tina\appdata\local\programs\python\python37\Lib\unittest\loader.py", line 377, in _get_module_from_name
+    __import__(name)
+  File "D:\Test-Driven-Development-with-Python\superlists\lists\tests.py", line 2, in <module>
+    from lists.views import home_page
+ImportError: cannot import name 'home_page' from 'lists.views' (D:\Test-Driven-Development-with-Python\superlists\lists\views.py)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)
+ ```
+ 因为我们没有编写home_page，报了我们预期的错误。
+ 
+
 
  
  

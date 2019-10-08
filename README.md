@@ -163,3 +163,92 @@ Ran 1 test in 14.989s
 FAILED (failures=1)
 ```
 这样不是更好吗！它整理了Firefox窗口，提供给我们一个友好格式的报告，其中显示了运行了多少个测试，哪些失败了，assertIn给了我们更有帮助的错误信息以及有用的调试信息。
+## 使用单元测试测试简单的页面
+在上一章中，功能测试失败，告诉我们它希望站点的首页标题带有“To-Do”。现在我们开始创建我们的应用程序了
+### 我们的第一个Django App，以及第一个单元测试
+我们开始to-do lists的应用：
+```
+$ python manage.py startapp lists
+```
+文件结构变成了这样：
+```
+superlists/
+├── db.sqlite3
+├── functional_tests.py
+├── lists
+│ ├── admin.py
+│ ├── apps.py
+│ ├── __init__.py
+│ ├── migrations
+│ │ └── __init__.py
+│ ├── models.py
+│ ├── tests.py
+│ └── views.py
+├── manage.py
+└── superlists
+ ├── __init__.py
+ ├── __pycache__
+ ├── settings.py
+ ├── urls.py
+ └── wsgi.py
+ ```
+ ### 单元测试，以及它们与功能测试的区别
+ 单元测试和功能测试之间的界限有时候变成非常的模糊。最基本的分别就是功能测试是从用户的角度从外部来测试应用。单元测试是从程序员的角度从内部来测试应用。然而TDD方法就是希望我们能够覆盖这两种测试类型。工作流如下：<br>
+ 1、我们从写功能测试开始，从用户的角度描述新的功能。<br>
+ 2、一旦我们的功能测试失败了，我们就开始考虑怎么编写可以通过测试的代码。我们现在使用一个或者多个单元测试来定义我们希望代码的行为方式，这个想法是，你们编写的每一行生产代码都应该通过至少一个单元测试进行测试。<br>
+ 3、单元测试失败后，我们将编写尽可能少的应用程序代码，来让单元测试通过。我们可能会在第2步和第3步之间重复几次，直到我们认为功能测试可以更进一步。<br>
+ 4、现在我们重新运行功能测试，看看它们是否通过，或者进一步测试。这可能促使我们编写一些新的单元测试和一些新的代码，等等。<br>
+ 你可以看到，从头到尾，功能测试从高层次驱使着我们的工作发展，而单元测试则从低层次驱动着我们的工作。<br>
+ 这看起来有点多余？有时会这种感觉，但是功能测试和单元测试有着完全不同的目标，并且通常最终看起来完全不同。<br>
+ 注意：功能测试应该帮助你正确地建立应用程序功能，并确保你不会意外破坏它。单元测试应该帮助你来编写干净无错误的代码。<br>
+ 到目前为止已经有足够多的理论了，接下来我们看看怎么实践了。
+ ### 在Django中的单元测试
+ 对于主页我们怎么来编写单元测试。我们来写一个小的单元测试，在lists/tests.py中
+  ```
+from django.test import TestCase
+
+# Create your tests here.
+class SmokeTest(TestCase):
+    def test_bad_maths(self):
+        self.assertEqual(1 + 1, 3)
+ ```
+ 执行命令：
+ ```
+ $python manage.py test
+ ```
+ 运行结果：
+ ```
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+F
+======================================================================
+FAIL: test_bad_maths (lists.tests.SmokeTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "D:\Test-Driven-Development-with-Python\superlists\lists\tests.py", line 6, in test_bad_maths
+    self.assertEqual(1 + 1, 3)
+AssertionError: 2 != 3
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+Destroying test database for alias 'default'...
+```
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

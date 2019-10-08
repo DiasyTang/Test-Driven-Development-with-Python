@@ -2,3 +2,7 @@
 geckodriver.log
 
 superlists/superlists/__pycache__/
+
+superlists/lists/__pycache__/
+
+superlists/lists/migrations/__pycache__/

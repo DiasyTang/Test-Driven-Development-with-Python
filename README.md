@@ -384,6 +384,146 @@ Ran 1 test in 0.002s
 OK
 Destroying test database for alias 'default'...
 ```
+ ### 单元测试视图
+ 我们继续为视图编写测试，让它可以对浏览器页面做出真正的响应。打开list/test.py，增加一个新的测试方法，我将解释每一点：
+ ```
+from django.test import TestCase
+from django.urls import resolve
+from django.http import HttpRequest
+
+from lists.views import home_page
+
+# Create your tests here.
+class HomePageTest(TestCase):
+    def test_root_url_resolves_to_home_page_view(self):
+        found = resolve("/")
+        self.assertEqual(found.func, home_page)
+
+    def test_home_page_returns_correct_html(self):
+        request=HttpRequest()(1)
+        response=home_page(request)(2)
+        html=response.content.decode("utf8")(3)
+        self.assertTrue(html.startswith("uft8"))(4)
+        self.assertIn("<title>To-Do lists</title>",html)(5)
+        self.assertTrue(html.endswith("</html>"))(4)
+
+```
+(1)我们创建了一个HttpRequest对象，当用户浏览器请求页面时，Django将会给我们看见这个对象 <br>
+(2)我们将这个对象传给home_page视图，它将给我们一个响应。这个对象就是被称为HttpResponse类的实例<br>
+(3)然后，我们提取响应的.content。这是一些原始字节，即发送给浏览器的0和1.我们通过.decode()将它们转换为发送给用户的HTML字符串<br>
+(4)我们想要以<html>标记开始并以它结束 <br>
+(5)我们想要在中间某个地方找到<title>标记，并在其中包含“To-Do lists”，这是因为它是我们功能测试中特写的内容<br>
+ 再一次提醒，单元测试通过功能测试驱动，但是它又更接近于实际代码，我们现在正像程序员一样思考。
+ 现在我们来运行这个单元测试，并看看会发生什么
+ ```
+ ERROR: test_home_page_returns_correct_html (lists.tests.HomePageTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/tina/test/Test-Driven-Development-with-Python/superlists/lists/tests.py", line 15,in test_home_page_returns_correct_html
+    response=home_page(request)
+TypeError: home_page() takes 0 positional arguments but 1 was given
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.004s
+
+FAILED (errors=1)
+Destroying test database for alias 'default'...
+```
+### 单元测试/代码周期
+现在我们可以进入单元测试/代码周期了：
+1､在终端，运行单元测试看它们是怎么失败的 <br>
+2､在编辑器中，以最小的代码变动来解决当前测试的失败<br>
+并且重复这些！<br>
+我们对每个代码的变动越小且越少为好，我们的想法是绝对确保每一个代码段都可以通过测试证明是正确的，下面让我们来看看多快可以完成这个周期：
+#### 最小代码变动：（lists/views.py）
+```
+def home_page(request):
+    pass
+```
+#### 测试：
+```
+ html=response.content.decode("utf8")
+AttributeError: 'NoneType' object has no attribute 'content'
+```
+#### 代码--我们使用django.http.HttpResponse，如下：（lists/views.py） 
+```
+from django.shortcuts import render
+from django.http import HttpResponse
+
+# Create your views here.
+def home_page(request):
+    return  HttpResponse()
+ ```
+ #### 再次测试：
+ ```
+ self.assertTrue(html.startswith("<html>"))
+AssertionError: False is not true
+ ```
+ #### 再次代码：（lists/views.py）
+ ```
+ def home_page(request):
+    return  HttpResponse("<html>")
+ ```
+  #### 再次测试：
+ ```
+ self.assertIn("<title>To-Do lists</title>",html)
+AssertionError: '<title>To-Do lists</title>' not found in '<html>'
+ ```
+  #### 再次代码：（lists/views.py）
+ ```
+ def home_page(request):
+       return  HttpResponse("<html><title>To-Do lists</title>")
+ ```
+  #### 再次测试：
+ ```
+ self.assertTrue(html.endswith("</html>"))
+AssertionError: False is not true
+ ```
+ #### 最后一次编码：（lists/views.py）
+ ```
+ def home_page(request):
+       return  HttpResponse("<html><title>To-Do lists</title></html>")
+ 
+ 结果：
+ Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.004s
+
+OK
+Destroying test database for alias 'default'...
+ ```
+ 现在我们运行功能测试
+ ```
+ $ python functional_tests.py
+
+     ---------------------------------------------------------------------
+    Traceback (most recent call last):
+      File "functional_tests.py", line 19, in
+    test_can_start_a_list_and_retrieve_it_later
+        self.fail('Finish the test!')
+    AssertionError: Finish the test!
+     ---------------------------------------------------------------------
+    Ran 1 test in 1.609s
+    FAILED (failures=1)
+ ```
+ 功能测试并没有失败，只不过是一个小小的提示。还不错，我们掌握了：
+ 1､开启一个Django应用 <br>
+ 2､Django单元测试运行者 <br>
+ 3､功能测试与单元测试的区别<br>
+ 4､Django url解释与urls.py<br>
+ 5､Django视图方法，请求和响应对象 <br>
+ 6､返回一个基本的HTML<br>
+ #### 一些有用的命令
+ 1､python manage.py runserver（运行Django服务器)<br>
+ 2､python functional_tests.py（运行功能测试)<br>
+ 3､python manage.py test（运行单元测试)<br>
+ 单元测试/代码周期：
+ 1､在终端运行单元测试。<br>
+ 2､在编辑中做最小的变动<br>
+ 3､重复进行1和2<br>
+ 
  
 
 

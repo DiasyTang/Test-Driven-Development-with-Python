@@ -474,7 +474,7 @@ AssertionError: '<title>To-Do lists</title>' not found in '<html>'
  def home_page(request):
        return  HttpResponse("<html><title>To-Do lists</title>")
  ```
-  #### 再次测试：
+ #### 再次测试：
  ```
  self.assertTrue(html.endswith("</html>"))
 AssertionError: False is not true
@@ -523,9 +523,94 @@ Destroying test database for alias 'default'...
  1､在终端运行单元测试。<br>
  2､在编辑中做最小的变动<br>
  3､重复进行1和2<br>
- 
- 
+ ## 这些测试在做什么了（以及重构）
+ ### 使用Selenium来测试用户交互
+ 在上一章结尾处在哪里？让我们重新运行测试并找出：
+ ```
+ FAIL: test_can_start_a_list_and_retrieve_it_later (__main__.NewVisitorTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "d:\Test-Driven-Development-with-Python\functional_test.py", line 15, in test_can_start_a_list_and_retrieve_it_later
+    self.fail("Finish the test!")
+AssertionError: Finish the test!
 
+----------------------------------------------------------------------
+Ran 1 test in 11.693s
+
+FAILED (failures=1)
+ ```
+ 你可以试试，如果你得到网页加载有问题或者无法链接？那是因为我忘记打开服务器了（pyhton manage.py runserver）。在这之后你将会提到上面的错误信息了。现在我们打开functional_tests.py并扩展这个方法：
+ ```
+ from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+import unittest
+
+
+class NewVisitorTest(unittest.TestCase):
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_start_a_list_and_retrieve_it_later(self):
+        self.browser.get("http://localhost:8000")
+
+        self.assertIn("To-Do", self.browser.title)
+        header_text = self.browser.find_element_by_tag_name("h1").text (1)
+        self.assertIn("To-Do", header_text)
+
+        inputbox = self.browser.find_elements_by_id("id_new_item") (1)
+        self.assertEqual(inputbox.__getattribute__("placeholder"), "Enter a to-do item")
+
+        inputbox.send_keys("Buy peacock feathers") (2)
+
+        inputbox.send_keys(Keys.ENTER) (3)
+        time.sleep(1) (4)
+
+        table = self.browser.find_elements_by_id("id_list_table")
+        rows = table.find_element_by_tag_name("tr") (1)
+        self.assertTrue(any(row.text == "1:Buy peacock feathers" for row in rows))
+
+        self.fail("Finish the test!")
+
+
+if __name__ == "__main__":
+    unittest.main(warnings="ignore")
+
+```
+ (1)我们正在使用Selenium提供的几种方法来检查网页：find_element_by_tag_name,find_element_by_id和find_elements_by_tag_name（请注意：额外的s表示 它将返回多个元素，而不是一个元素）<br>
+ (2)我们还使用send_keys，这是打字到输入框的selenium的方法。<br>
+ (3)通过keys类（不是忘记导入），我们可以发送特殊键例如Enter键<br>
+ (4)当我们点击Enter，这个页面将会重新刷新。这里的time.sleep是确保浏览器已经完成加载了在我们对于新页面进行断言之前。这个称为“显式断言”，我们将会在第六章做改善。<br>
+现在我们来看看怎么测试：
+```
+$ python functional_tests.py
+======================================================================
+ERROR: test_can_start_a_list_and_retrieve_it_later (__main__.NewVisitorTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "d:\Test-Driven-Development-with-Python\functional_test.py", line 18, in test_can_start_a_list_and_retrieve_it_later
+    header_text = self.browser.find_element_by_tag_name("h1").text
+  File "C:\Users\tina\envs\venv\lib\site-packages\selenium\webdriver\remote\webdriver.py", line 530, in find_element_by_tag_name
+    return self.find_element(by=By.TAG_NAME, value=name)
+  File "C:\Users\tina\envs\venv\lib\site-packages\selenium\webdriver\remote\webdriver.py", line 978, in find_element
+    'value': value})['value']
+  File "C:\Users\tina\envs\venv\lib\site-packages\selenium\webdriver\remote\webdriver.py", line 321, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\tina\envs\venv\lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 242, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchElementException: Message: Unable to locate element: h1
+
+
+----------------------------------------------------------------------
+Ran 1 test in 7.315s
+
+FAILED (errors=1)
+```
+对此进行解码，这个测试是说无法在这个页面找到<h1>元素。现在看我们怎么添加这个元素到我们的主页面。
+### “不需要测试常量”的规则，救援模板
 
  
  
